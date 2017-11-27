@@ -1,0 +1,709 @@
+---
+title: "Red Wine Analysis"
+author: "Karthik Pandy"
+date: "September 28, 2017"
+output: html_document
+---
+
+Red Wine Quality Exploration by Karthik Pandy
+========================================================
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, packages}
+# Load all of the packages that you end up using in your analysis in this code
+# chunk.
+
+# Notice that the parameter "echo" was set to FALSE for this code chunk. This
+# prevents the code from displaying in the knitted HTML output. You should set
+# echo=FALSE for all code chunks in your file, unless it makes sense for your
+# report to show the code that generated a particular plot.
+
+# The other parameters for "message" and "warning" should also be set to FALSE
+# for other code chunks once you have verified that each plot comes out as you
+# want it to. This will clean up the flow of your report.
+
+library(ggplot2)
+library(gridExtra)
+library(GGally)
+```
+
+```{r echo=FALSE, Load_the_Data}
+# Load the Data
+redwine <- read.csv('wineQualityReds.csv')
+```
+
+This report analyzes red wine data with 1599 Observations and 13 variables
+
+```{r echo=FALSE, Dim_Data}
+dim(redwine)
+```
+
+#The strucuture of the data:
+
+```{r echo=FALSE, Structure_of_Data}
+str(redwine)
+```
+
+creating a new variable with Quality as factor
+
+```{r}
+redwine$quality_fact <- factor(redwine$quality, levels=c(0,1,2,3,4,5,6,7,8,9,10))
+```
+
+
+# Univariate Plots Section
+
+#Summary of Data:
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, Summary_Data}
+summary(redwine)
+```
+
+Based on the above summary of data most of the wine samples are with quality 5,6 and 7. Below is the histogram of the same
+
+
+```{r echo=FALSE,  message=FALSE, warning=FALSE,Univariate_Plot_Quality}
+
+ggplot(redwine, aes(quality)) + 
+  geom_histogram(stat = 'count') +
+  scale_x_continuous() +
+  xlab("Wine Quality") +
+  ylab("Number of Samples") +
+  xlim(3,8)  
+```
+
+Quality Summary:
+
+```{r echo=FALSE,  message=FALSE, warning=FALSE,Univariate_Plot_Quality_summ}
+
+summary(redwine$quality_fact)
+```
+
+Let's see the distribution of other variables. I limited the x - axis based on the minimum and maximum values
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, fixed.acidity}
+ggplot(redwine, aes(fixed.acidity)) + 
+  geom_histogram(binwidth = 0.2,fill=I("blue"), alpha=I(.5), color = I("black")) +
+  scale_x_continuous() +
+  xlab("Fixed Acidity") +
+  ylab("Number of Samples") +
+  coord_cartesian(xlim=c(4,16))
+
+
+```
+
+Fixed Acidity Summary:
+
+```{r echo=FALSE,  message=FALSE, warning=FALSE,fixed.acidity_summ}
+
+summary(redwine$fixed.acidity)
+```
+
+This distribution is positively skewed
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, volatile.acidity}
+ggplot(redwine, aes(volatile.acidity)) + 
+  geom_histogram(binwidth = 0.1,fill=I("blue"), alpha=I(.5), color = I("black")) +
+  scale_x_continuous() +
+  xlab("Volatile Acidity") +
+  ylab("Number of Samples") +
+  coord_cartesian(xlim=c(0,2)) 
+
+```
+
+Volatile Acidity Summary:
+
+```{r echo=FALSE,  message=FALSE, warning=FALSE,volatile.acidity_summ}
+
+summary(redwine$volatile.acidity)
+```
+
+This distribution is normal with long tail in right
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, citric.acidity}
+ggplot(redwine, aes(citric.acid)) + 
+  geom_histogram(binwidth = 0.05,fill=I("blue"), alpha=I(.5), color = I("black")) +
+  scale_x_continuous() +
+  xlab("Citric Acid") +
+  ylab("Number of Samples") +
+  coord_cartesian(xlim=c(0,1))
+```
+
+Citric Acidity Summary:
+
+```{r echo=FALSE,  message=FALSE, warning=FALSE,citric.acidity_summ}
+
+summary(redwine$citric.acidity)
+```
+
+This distribution has multiple peaks in it with more on lower side
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, residual.sugar}
+grid.arrange(ggplot(redwine, aes(residual.sugar)) + 
+  geom_histogram(binwidth = 0.5,fill=I("blue"), alpha=I(.5), color = I("black")) +
+  scale_x_continuous() +
+  xlab("Residual Sugar") +
+  ylab("Number of Samples") +
+  coord_cartesian(xlim=c(0.9,16)), ggplot(redwine, aes(x = 1, y = residual.sugar)) +   geom_boxplot() +
+  xlab("Residual Sugar") +
+  ylab("Number of Samples") , ncol = 2)
+```
+
+Residual Sugar Summary:
+
+```{r echo=FALSE,  message=FALSE, warning=FALSE,residual.sugar_summ}
+
+summary(redwine$residual.sugar)
+```
+
+This distribution is positively skewed with outliers creating a long tail
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, residual.sugar.updated}
+ggplot(redwine, aes(residual.sugar)) + 
+  geom_histogram(fill=I("blue"), alpha=I(.5), color = I("black")) +
+  xlab("Residual Sugar") +
+  ylab("Number of Samples") +
+  xlim(0.9,quantile(redwine$residual.sugar,0.95))
+```
+
+This distribution looks better after excluding the top 5%
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, chlorides}
+grid.arrange(ggplot(redwine, aes(chlorides)) + 
+  geom_histogram(binwidth = 0.01,fill=I("blue"), alpha=I(.5), color = I("black")) +
+  scale_x_continuous() +
+  xlab("Chlorides") +
+  ylab("Number of Samples") +
+  coord_cartesian(xlim=c(0.01,0.62)), ggplot(redwine, aes(x = 1, y = chlorides)) +   geom_boxplot() +
+  xlab("Chlorides") +
+  ylab("Number of Samples") , ncol = 2)
+```
+
+Chlorides Summary:
+
+```{r echo=FALSE,  message=FALSE, warning=FALSE,chlorides_summ}
+
+summary(redwine$chlorides)
+```
+
+This distribution is also positively skewed with outliers creating a long tail
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, chlorides.updated}
+ggplot(redwine, aes(chlorides)) + 
+  geom_histogram(fill=I("blue"), alpha=I(.5), color = I("black")) +
+  xlab("Chlorides") +
+  ylab("Number of Samples") +
+  xlim(0.01,quantile(redwine$chlorides,0.95))
+```
+
+Now the distribution is normal after excluding the top 5%
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, free.sulfur.dioxide}
+ggplot(redwine, aes(free.sulfur.dioxide)) + 
+  geom_histogram(binwidth = 1,fill=I("blue"), alpha=I(.5), color = I("black")) +
+  scale_x_continuous() +
+  xlab("Free Sulfur Dioxide") +
+  ylab("Number of Samples") +
+  coord_cartesian(xlim=c(1,72))
+```
+
+Free Sulfur Dioxide Summary:
+
+```{r echo=FALSE,  message=FALSE, warning=FALSE,free.sulfur.dioxide_summ}
+
+summary(redwine$free.sulfur.dioxide)
+```
+
+free.sulfur.dioxide distribution is also positively skewed with outliers creating a long tail
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, total.sulfur.dioxide}
+grid.arrange(ggplot(redwine, aes(total.sulfur.dioxide)) + 
+  geom_histogram(fill=I("blue"), alpha=I(.5), color = I("black")) +
+  scale_x_continuous() +
+  xlab("Total Sulfur Dioxide") +
+  ylab("Number of Samples") +
+  coord_cartesian(xlim=c(1,300)), ggplot(redwine, aes(x = 1, y = total.sulfur.dioxide)) +   geom_boxplot() +
+  xlab("Total Sulfur Dioxide") +
+  ylab("Number of Samples") , ncol = 2)
+```
+
+Total Sulfur Dioxide Summary:
+
+```{r echo=FALSE,  message=FALSE, warning=FALSE,total.sulfur.dioxide_summ}
+
+summary(redwine$total.sulfur.dioxide)
+```
+
+total.sulfur.dioxide distribution is also positively skewed with outliers creating a long tail
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, total.sulfur.dioxide.updated}
+ggplot(redwine, aes(total.sulfur.dioxide)) + 
+  geom_histogram(fill=I("blue"), alpha=I(.5), color = I("black")) +
+  xlab("Total Sulfur Dioxide") +
+  ylab("Number of Samples") +
+  xlim(1,quantile(redwine$total.sulfur.dioxide,0.95))
+```
+
+total.sulfur.dioxide distribution after removing the outliers
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, density}
+ggplot(redwine, aes(density)) + 
+  geom_histogram(binwidth = 0.001,fill=I("blue"), alpha=I(.5), color = I("black")) +
+  scale_x_continuous() +
+  xlab("Density") +
+  ylab("Number of Samples") +
+  coord_cartesian(xlim=c(0.99,1.01))
+```
+
+Density Summary:
+
+```{r echo=FALSE,  message=FALSE, warning=FALSE,density_summ}
+
+summary(redwine$density)
+```
+
+Density looks like a normal distribution
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, pH}
+ggplot(redwine, aes(pH)) + 
+  geom_histogram(binwidth = 0.06,fill=I("blue"), alpha=I(.5), color = I("black")) +
+  scale_x_continuous() +
+  xlab("pH") +
+  ylab("Number of Samples") +
+  coord_cartesian(xlim=c(2,5))
+```
+
+pH Summary:
+
+```{r echo=FALSE,  message=FALSE, warning=FALSE,pH_summ}
+
+summary(redwine$pH)
+```
+
+pH looks like a normal distribution
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, sulphates}
+ggplot(redwine, aes(sulphates)) + 
+  geom_histogram(binwidth = 0.1,fill=I("blue"), alpha=I(.5), color = I("black")) +
+  scale_x_continuous() +
+  xlab("Sulphates") +
+  ylab("Number of Samples") +
+  coord_cartesian(xlim=c(0,2))
+```
+
+Sulphates Summary:
+
+```{r echo=FALSE,  message=FALSE, warning=FALSE,sulphates_summ}
+
+summary(redwine$sulphates)
+```
+
+Sulphates distribution are positively skewed with few outliers wiht a peak from 0.5 to 0.7
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, alcohol}
+ggplot(redwine, aes(alcohol)) + 
+  geom_histogram(binwidth = 0.3,fill=I("blue"), alpha=I(.5), color = I("black")) +
+  scale_x_continuous() +
+  xlab("Alcohol") +
+  ylab("Number of Samples") +
+  coord_cartesian(xlim=c(8,15))
+```
+
+Alcohol Summary:
+
+```{r echo=FALSE,  message=FALSE, warning=FALSE,alcohol_summ}
+
+summary(redwine$alcohol)
+```
+
+Alcohol is positively skewed with majority between 9 - 10
+
+# Univariate Analysis
+
+### What is the structure of your dataset?
+
+There are 1599 observations and 13 attributes in this data set. 
+
+### What is/are the main feature(s) of interest in your dataset?
+
+Quality is the main variable which we are analysing. But in thhe sample majority are in the middle range(5-7) only.
+
+### What other features in the dataset do you think will help support your investigation into your feature(s) of interest?
+
+There will be multiple variables which can help the analysis, but we need to see some bivariate analysis to get into that
+
+### Did you create any new variables from existing variables in the dataset?
+
+created the Quality as ordered factor, which can be used in some plots ir analysis
+
+### Of the features you investigated, were there any unusual distributions? Did you perform any operations on the data to tidy, adjust, or change the form of the data? If so, why did you do this?
+
+Most of the plots are positively skewed is one observation.
+
+
+# Bivariate Plots Section
+
+Lets see correlation of the variables
+
+```{r echo=FALSE,  message=FALSE, warning=FALSE,Correlation}
+#cor(x=redwine[,2:12], y=redwine$quality)
+ggcorr(redwine[, 2:13], label = TRUE)
+```
+
+Based on the above result we get the following relationships between the variables.
+
+###Positive Relationship:
+
+1. Alcohol and Quality 
+2. Free Sulfur Dioxide and Total Sulfur Dioxide
+3. Fixed Acidity and Citric Acid
+4. Fixed Acidity and Density
+
+
+###Negative Relationship:
+
+1. Volatile Acidity and Quality
+2. Density and Alcohol
+3. Citric Acid and pH
+4. Volatile Acidity and Citric Acid
+5. Fixed Acidity and pH
+
+Let's see the relationships in plots
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, Bivariate_plots_1}
+
+ggplot(aes(x=quality_fact,y=alcohol), data= redwine) +
+  geom_jitter( alpha = .3)  +
+  geom_boxplot( alpha = .5,color = 'blue')+
+  stat_summary(fun.y = "median", 
+               geom = "point", 
+               color = "red", 
+               shape = 8, 
+               size = 2)+
+  stat_summary(fun.y = "mean", 
+               geom = "point", 
+               color = "red", 
+               shape = 6, 
+               size = 2) +
+xlab("Quality") +
+ylab("Alcohol (%)")
+```
+
+From the above plot we can see that for high quality wines the alcohol content is more.
+But we may also have in to account that for high quality wines the sample count are less.
+
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, Bivariate_plots_2}
+
+ggplot(aes(x=quality_fact,y=volatile.acidity), data= redwine) +
+  geom_jitter( alpha = .3)  +
+  geom_boxplot( alpha = .5,color = 'blue')+
+  stat_summary(fun.y = "median", 
+               geom = "point", 
+               color = "red", 
+               shape = 8, 
+               size = 2)+
+  stat_summary(fun.y = "mean", 
+               geom = "point", 
+               color = "red", 
+               shape = 6, 
+               size = 2)+
+xlab("Quality") +
+ylab("Volatile Acidity")
+```
+
+From the above plot we can see that for high quality wines the Volatile Acidity is less
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, Bivariate_plots_3}
+ggplot(aes(x=total.sulfur.dioxide,y=free.sulfur.dioxide), data= redwine) +
+  geom_point(alpha = 0.3) +
+  ylim(quantile(redwine$free.sulfur.dioxide,0.01), quantile(redwine$free.sulfur.dioxide,0.99)) +
+  xlim(quantile(redwine$total.sulfur.dioxide,0.01), quantile(redwine$total.sulfur.dioxide,0.99)) +
+  geom_smooth(method = 'lm')+
+xlab("Quality") +
+ylab("Volatile Acidity")
+  
+
+```
+
+This plot shows an increasing trend, but most of the data points are converged at low combinations
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, Bivariate_plots_4}
+ggplot(aes(x=fixed.acidity,y=citric.acid), data= redwine) +
+  geom_point(alpha = 0.3) +
+  #ylim(quantile(redwine$free.sulfur.dioxide,0.01), quantile(redwine$free.sulfur.dioxide,0.99)) +
+  #xlim(quantile(redwine$total.sulfur.dioxide,0.01), quantile(redwine$total.sulfur.dioxide,0.99)) +
+  geom_smooth(method = 'lm')+
+xlab("Fixed Acidity") +
+ylab("Citric Acid")
+  
+
+```
+
+This plot shows an increasing trend
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, Bivariate_plots_5}
+ggplot(aes(x=density,y=fixed.acidity), data= redwine) +
+  geom_point(alpha = 0.3) +
+  #ylim(quantile(redwine$free.sulfur.dioxide,0.01), quantile(redwine$free.sulfur.dioxide,0.99)) +
+  #xlim(quantile(redwine$total.sulfur.dioxide,0.01), quantile(redwine$total.sulfur.dioxide,0.99)) +
+  geom_smooth(method = 'lm')+
+xlab("Density") +
+ylab("Fixed Acidity")
+  
+
+```
+
+This has a good increasing trend with many points near the middle region
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, Bivariate_plots_6}
+ggplot(aes(x=density,y=alcohol), data= redwine) +
+  geom_point(alpha = 0.5) +
+  #ylim(quantile(redwine$free.sulfur.dioxide,0.01), quantile(redwine$free.sulfur.dioxide,0.99)) +
+  #xlim(quantile(redwine$total.sulfur.dioxide,0.01), quantile(redwine$total.sulfur.dioxide,0.99)) +
+  geom_smooth(method = 'lm')+
+xlab("Alcohol") +
+ylab("Density")
+
+```  
+
+This has a good negative relationship and shows if alcohol content increases the Density seems to reduce
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, Bivariate_plots_7}
+ggplot(aes(x=citric.acid,y=pH), data= redwine) +
+  geom_point(alpha = 0.3) +
+  #ylim(quantile(redwine$free.sulfur.dioxide,0.01), quantile(redwine$free.sulfur.dioxide,0.99)) +
+  #xlim(quantile(redwine$total.sulfur.dioxide,0.01), quantile(redwine$total.sulfur.dioxide,0.99)) +
+  geom_smooth(method = 'lm')+
+xlab("Citric Acid") +
+ylab("pH")
+
+``` 
+
+This has a relationship but very less
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, Bivariate_plots_8}
+ggplot(aes(x=volatile.acidity,y=citric.acid), data= redwine) +
+  geom_point(alpha = 0.3) +
+  #ylim(quantile(redwine$free.sulfur.dioxide,0.01), quantile(redwine$free.sulfur.dioxide,0.99)) +
+  xlim(quantile(redwine$volatile.acidity,0.01), quantile(redwine$volatile.acidity,0.99)) +
+  geom_smooth(method = 'lm')+
+xlab("Volatile Acidity") +
+ylab("Citric Acid")
+
+``` 
+
+This has a more scatterd data points.
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, Bivariate_plots_9}
+ggplot(aes(x=fixed.acidity,y=pH), data= redwine) +
+  geom_point(alpha = 0.3) +
+  #ylim(quantile(redwine$free.sulfur.dioxide,0.01), quantile(redwine$free.sulfur.dioxide,0.99)) +
+  #xlim(quantile(redwine$total.sulfur.dioxide,0.01), quantile(redwine$total.sulfur.dioxide,0.99)) +
+  geom_smooth(method = 'lm')+
+xlab("Fixed Acidity") +
+ylab("pH")
+
+``` 
+
+
+
+# Bivariate Analysis
+
+### Talk about some of the relationships you observed in this part of the \
+investigation. How did the feature(s) of interest vary with other features in \
+the dataset?
+
+These are the few medium and stron relationships found in the data
+
+1. Alcohol and Quality 
+2. Free Sulfur Dioxide and Total Sulfur Dioxide
+3. Fixed Acidity and Citric Acid
+4. Fixed Acidity and Density
+5. Volatile Acidity and Quality
+6. Density and Alcohol
+7. Citric Acid and pH
+8. Volatile Acidity and Citric Acid
+9. Fixed Acidity and pH
+
+### Did you observe any interesting relationships between the other features \
+(not the main feature(s) of interest)?
+
+Out of all the relationships i feel the below are promising
+
+1. Alcohol and Quality
+2. Volatile Acidity and Quality
+3. Density and Alcohol
+4. Fixed Acidity and pH
+
+### What was the strongest relationship you found?
+
+Fixed Acidity and pH is the strongest relationship
+
+# Multivariate Plots Section
+
+Based on our promising relationships from Bivariate section, we can add the Quality to it and see how it looks
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, Multivariate_Plots}
+ggplot(aes(x=density,y=alcohol, color = quality_fact), data= redwine) +
+  geom_point(alpha = 0.8, size = 1) +
+  geom_smooth(method = "lm", se = FALSE,size=1)  +
+  scale_color_brewer(type='seq',palette = "Greens",
+                   guide=guide_legend(title='Quality')) +
+  xlab("Density") +
+  ylab("Alcohol (%)")
+  #ylim(quantile(redwine$density,0.01), quantile(redwine$density,0.99)) +
+  #xlim(quantile(redwine$fixed.acidity,0.01), quantile(redwine$fixed.acidity,0.99))
+
+```
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, Multivariate_Plots_1}
+ggplot(aes(x=density,y=alcohol), data= redwine) +
+  geom_point(alpha = 0.8, size = 1) +
+  geom_smooth(method = "lm", se = FALSE,size=1)  +
+  scale_color_brewer(type='seq',palette = "Greens",
+                   guide=guide_legend(title='Quality')) +
+  facet_wrap(~quality_fact, nrow = 3)+
+  xlab("Density") +
+  ylab("Alcohol (%)")
+  #ylim(quantile(redwine$density,0.01), quantile(redwine$density,0.99)) +
+  #xlim(quantile(redwine$fixed.acidity,0.01), quantile(redwine$fixed.acidity,0.99))
+
+```
+
+
+
+Looks like high alcohol % and less density has a tendency to increase the quality of wine
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, Multivariate_Plots_2}
+ggplot(aes(x=pH,y=fixed.acidity, color = quality_fact), data= redwine) +
+  geom_point(alpha = 0.8, size = 1) +
+  geom_smooth(method = "lm", se = FALSE,size=1)  +
+  scale_color_brewer(type='seq',palette = "Greens",
+                   guide=guide_legend(title='Quality')) +
+  xlab("pH") +
+  ylab("Fixed Acidity")
+  #ylim(quantile(redwine$density,0.01), quantile(redwine$density,0.99)) +
+  #xlim(quantile(redwine$fixed.acidity,0.01), quantile(redwine$fixed.acidity,0.99))
+
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, Multivariate_Plots_3}
+ggplot(aes(x=pH,y=fixed.acidity), data= redwine) +
+  geom_point(alpha = 0.8, size = 1) +
+  geom_smooth(method = "lm", se = FALSE,size=1)  +
+  scale_color_brewer(type='seq',palette = "Greens",
+                   guide=guide_legend(title='Quality')) +
+  facet_wrap(~quality_fact, nrow = 3)+
+  xlab("pH") +
+  ylab("Fixed Acidity")
+  #ylim(quantile(redwine$density,0.01), quantile(redwine$density,0.99)) +
+  #xlim(quantile(redwine$fixed.acidity,0.01), quantile(redwine$fixed.acidity,0.99))
+
+```
+
+So High Fixed Acidity and low pH value has a tendency to increase the wine quality
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, Multivariate_Plots_4}
+ggplot(aes(x=volatile.acidity,y=alcohol, color = quality_fact), data= redwine) +
+  geom_point(alpha = 0.8, size = 1) +
+  geom_smooth(method = "lm", se = FALSE,size=1)  +
+  scale_color_brewer(type='seq',palette = "Greens",
+                   guide=guide_legend(title='Quality')) +
+  xlab("Volatile Acidity") +
+  ylab("Alcohol (%)")
+  #ylim(quantile(redwine$density,0.01), quantile(redwine$density,0.99)) +
+  #xlim(quantile(redwine$fixed.acidity,0.01), quantile(redwine$fixed.acidity,0.99))
+
+```
+
+
+So High Alcohol percentage and low Volatile Acidity also has a tendency to increase the wine quality
+
+
+# Multivariate Analysis
+
+### Talk about some of the relationships you observed in this part of the \
+investigation. Were there features that strengthened each other in terms of \
+looking at your feature(s) of interest?
+
+Alcohol % have positive correlations with quality. Higher quality wines tend to be higher in alcohol. Higher quality wines tend to be lower in volatile acidity and Density
+
+So High Alcohol percentage, low Volatile Acidity and low density also has a tendency to increase the wine quality
+
+  
+# Final Plots and Summary
+
+### Plot One
+```{r echo=FALSE,message = FALSE,warning =FALSE, Plot_One}
+ggplot(redwine, aes(quality)) + 
+  geom_histogram(stat = 'count') +
+  scale_x_continuous() +
+  xlab("Wine Quality") +
+  ylab("Number of Samples") +
+  xlim(3,8) 
+```
+
+### Description One
+
+This plot is the first interesting plot which shows the quality of wines distribution in the sample and it interestingly most of the samples are in 5 to 7 range
+
+### Plot Two
+```{r echo=FALSE, message=FALSE, warning=FALSE, Plot_Two}
+ggplot(aes(x=quality_fact,y=alcohol), data= redwine) +
+  geom_jitter( alpha = .3)  +
+  geom_boxplot( alpha = .5,color = 'blue')+
+  stat_summary(fun.y = "median", 
+               geom = "point", 
+               color = "red", 
+               shape = 8, 
+               size = 2)+
+  stat_summary(fun.y = "mean", 
+               geom = "point", 
+               color = "red", 
+               shape = 6, 
+               size = 2) +
+xlab("Quality") +
+ylab("Alcohol (%)")
+```
+
+### Description Two
+
+This plot is another important one which shows the Alcohol % impact on Quality
+
+
+### Plot Three
+```{r echo=FALSE, message=FALSE, warning=FALSE, Plot_Three}
+ggplot(aes(x=volatile.acidity,y=alcohol, color = quality_fact), data= redwine) +
+  geom_point(alpha = 0.8, size = 1) +
+  geom_smooth(method = "lm", se = FALSE,size=1)  +
+  scale_color_brewer(type='seq',palette = "Greens",
+                   guide=guide_legend(title='Quality')) +
+  xlab("Volatile Acidity") +
+  ylab("Alcohol (%)")
+  #ylim(quantile(redwine$density,0.01), quantile(redwine$density,0.99)) +
+  #xlim(quantile(redwine$fixed.acidity,0.01), quantile(redwine$fixed.acidity,0.99))
+```
+
+### Description Three
+
+This is another interesting plot which shows less volatile acidity and more alcohol % increases the quality of wine
+
+------
+
+# Reflection
+
+This data set contains more information on red wines and their chemical properties.Based on the analysis it shows what features are impacting the quality. Few more information about the wine like price can helped in our analysis further. Also since the quality in sample data is more between 5 to 7, it makes to think most wines are in that quality range only or our sample is less.
+
+In analysing the data Plots like Histogram and Scatterplot helped more. Most of my analysis ideas came as Scatterplots only. 
+
+Also the main struggle in the analysis is knowing about the functional knowledge. Having a good domain knowledge will help in doing the analysis more easier.
+
+Finally increase in alcohol content increases wine quality. And less Volatile acidity, Density increase the wine quality. 
+
+
